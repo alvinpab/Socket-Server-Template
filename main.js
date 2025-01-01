@@ -20,7 +20,7 @@ server.listen(serverPort);
 console.log(`Server started on port ${serverPort} in stage ${process.env.NODE_ENV}`);
 
 // User ID management
-const availableIds = Array.from({ length: 10 }, (_, i) => `User${String(i + 1).padStart(2, '0')}`);
+const availableIds = Array.from({ length: 10 }, (_, i) => `User${String(i + 1).padStart(2, "0")}`);
 const assignedIds = new Map(); // Map WebSocket clients to assigned IDs
 
 wss.on("connection", function (ws, req) {
@@ -94,4 +94,15 @@ const broadcast = (ws, message, includeSelf) => {
 // Keep server alive by sending pings to all clients
 const keepServerAlive = () => {
   keepAliveId = setInterval(() => {
-    wss.cli
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send("ping");
+      }
+    });
+  }, 50000);
+};
+
+// Root route
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
